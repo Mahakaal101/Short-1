@@ -25,6 +25,10 @@ from database.gfilters_mdb import (
     find_gfilter,
     get_gfilters,
 )
+
+import os
+req_channel = int(os.environ.get('REQ_CHANNEL','-100'))
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -452,6 +456,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         ident, file_id = query.data.split("#")
         files_ = await get_file_details(file_id)
         if not files_:
+            await Client.send_message(req_channel, f"#REQUESTED_LOGS \n\n**CONTENT NAME:**'{search}' \n**REQUESTED BY:** {message.from_user.first_name}\n**USER ID :** {message.from_user.id}", reply_markup=InlineKeyboardMarkup{[[InlineKeyboardButton("Mark As done", callback_data="close_data")]]})
             return await query.answer('No such file exist.')
         files = files_[0]
         title = files.file_name
